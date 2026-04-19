@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Entrada</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      font-family: Arial, Helvetica, sans-serif;
+      background:
+        radial-gradient(circle at 15% 15%, rgba(84, 199, 255, .28), transparent 32%),
+        radial-gradient(circle at 85% 20%, rgba(220, 120, 255, .22), transparent 30%),
+        radial-gradient(circle at 70% 85%, rgba(255, 192, 110, .18), transparent 28%),
+        #f7f8fc;
+      color: #111827;
+      padding: 24px;
+    }
+    .card {
+      width: min(92vw, 720px);
+      background: rgba(255,255,255,.92);
+      border: 1px solid rgba(17,24,39,.08);
+      border-radius: 28px;
+      box-shadow: 0 18px 50px rgba(0,0,0,.08);
+      text-align: center;
+      padding: 32px 24px;
+      backdrop-filter: blur(10px);
+    }
+    .eyebrow {
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: .16em;
+      color: #6b7280;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+    .num {
+      font-size: clamp(72px, 20vw, 180px);
+      line-height: 1;
+      font-weight: 900;
+      margin: 0;
+    }
+    .sub {
+      margin-top: 12px;
+      font-size: 24px;
+      font-weight: 700;
+    }
+    .muted {
+      margin-top: 8px;
+      color: #6b7280;
+      font-size: 15px;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="eyebrow">Número de entrada</div>
+    <div class="num" id="numero">000</div>
+    <div class="sub">Festival de Colores y Agua</div>
+    <div class="muted">Reina de la Ilusión Écija</div>
+  </div>
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const numero = (params.get('numero') || '000').trim();
+    document.getElementById('numero').textContent = numero;
+    document.title = 'Entrada ' + numero;
+  </script>
+</body>
+</html>
