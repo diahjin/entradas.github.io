@@ -1,1 +1,86 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Generador de entradas en lote</title>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+<style>
+body{font-family:Arial;background:#f5f5f5;margin:0;padding:20px}
+.panel{max-width:400px}
+.ticket{width:600px;height:200px;background:white;border-radius:10px;margin:10px;padding:20px;display:flex;justify-content:space-between;align-items:center}
+.qr{width:100px;height:100px}
+</style>
+</head>
+
+<body>
+
+<div class="panel">
+<input id="evento" placeholder="Evento"><br>
+<input id="inicio" type="number" value="1"><br>
+<input id="cantidad" type="number" value="10"><br>
+
+<button onclick="generar()">Generar</button>
+<button onclick="descargarPDF()">PDF</button>
+</div>
+
+<div id="contenedor"></div>
+
+<script>
+function pad(n){return String(n).padStart(4,'0')}
+
+function generar(){
+  const cont = document.getElementById("contenedor");
+  cont.innerHTML="";
+
+  const evento = document.getElementById("evento").value;
+  const inicio = parseInt(document.getElementById("inicio").value);
+  const cantidad = parseInt(document.getElementById("cantidad").value);
+
+  for(let i=0;i<cantidad;i++){
+    const num = inicio+i;
+    const codigo = "ENT-"+pad(num);
+
+    const div = document.createElement("div");
+    div.className="ticket";
+    div.innerHTML=`
+      <div>
+        <h2>${evento}</h2>
+        <p>${codigo}</p>
+      </div>
+      <div id="qr-${i}" class="qr"></div>
+    `;
+
+    cont.appendChild(div);
+
+    new QRCode(document.getElementById(`qr-${i}`), {
+      text: codigo,
+      width:100,
+      height:100
+    });
+  }
+}
+
+async function descargarPDF(){
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF();
+
+  const tickets = document.querySelectorAll(".ticket");
+
+  for(let i=0;i<tickets.length;i++){
+    const canvas = await html2canvas(tickets[i]);
+    const img = canvas.toDataURL("image/png");
+
+    if(i>0) pdf.addPage();
+    pdf.addImage(img,"PNG",0,0);
+  }
+
+  pdf.save("entradas.pdf");
+}
+</script>
+
+</body>
+</html>
