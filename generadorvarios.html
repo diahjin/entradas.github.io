@@ -2,104 +2,101 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<title>Generador PRO</title>
+<title>Generador Festival</title>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 
 <style>
-body{font-family:Arial;background:#f6f7fb;padding:20px}
-.ticket{width:800px;height:250px;background:#111;color:#fff;margin:10px;padding:20px;border-radius:10px;display:flex;justify-content:space-between;align-items:center}
-.qr{width:120px;height:120px;background:#fff}
+body{font-family:Arial;background:#eef2f7;padding:20px}
+
+.ticket{
+ width:1024px;
+ height:768px;
+ margin:10px auto;
+ position:relative;
+ background:linear-gradient(120deg,#49c6ff,#f4a3ff);
+ overflow:hidden;
+}
+
+.title{
+ position:absolute;
+ top:260px;
+ left:100px;
+ font-size:50px;
+ font-weight:900;
+}
+
+.text{
+ position:absolute;
+ top:420px;
+ left:300px;
+ width:350px;
+ text-align:center;
+ font-size:22px;
+}
+
+.num{
+ position:absolute;
+ bottom:80px;
+ left:150px;
+ background:white;
+ padding:10px;
+ font-weight:900;
+}
+
+.qr{
+ position:absolute;
+ right:20px;
+ bottom:20px;
+ width:140px;
+ height:140px;
+ background:white;
+}
 </style>
 </head>
 
 <body>
 
-<input id="evento" placeholder="Evento"><br>
-<input id="inicio" type="number" value="1"><br>
-<input id="cantidad" type="number" value="10"><br>
+<input id="inicio" value="526"><br>
+<input id="cantidad" value="10"><br>
 
 <button onclick="generar()">Generar</button>
-<button onclick="pdf()">PDF</button>
-<button onclick="zip()">ZIP</button>
 
 <div id="c"></div>
 
 <script>
-let codigos=[];
-
-function pad(n){return String(n).padStart(4,'0')}
-
 function generar(){
-  const c=document.getElementById("c");
-  c.innerHTML="";
-  codigos=[];
+ const c=document.getElementById("c");
+ c.innerHTML="";
 
-  const evento=document.getElementById("evento").value;
-  const inicio=parseInt(document.getElementById("inicio").value);
-  const cantidad=parseInt(document.getElementById("cantidad").value);
+ let inicio=parseInt(document.getElementById("inicio").value);
+ let cantidad=parseInt(document.getElementById("cantidad").value);
 
-  for(let i=0;i<cantidad;i++){
-    const num=inicio+i;
-    const codigo="ENT-"+pad(num);
-    codigos.push(codigo);
+ for(let i=0;i<cantidad;i++){
+   let n=inicio+i;
 
-    const div=document.createElement("div");
-    div.className="ticket";
-    div.innerHTML=`
-      <div>
-        <h2>${evento}</h2>
-        <p>${codigo}</p>
-      </div>
-      <div id="qr-${i}" class="qr"></div>
-    `;
+   let div=document.createElement("div");
+   div.className="ticket";
+   div.innerHTML=`
+     <div class="title">FESTIVAL DE COLORES Y AGUA</div>
+     <div class="text">
+       Debe estar a las 19:00...<br>
+       Traiga ropa blanca
+     </div>
+     <div class="num">${n}</div>
+     <div id="qr-${i}" class="qr"></div>
+   `;
 
-    c.appendChild(div);
+   c.appendChild(div);
 
-    new QRCode(document.getElementById(`qr-${i}`),{
-      text:codigo,
-      width:120,
-      height:120
-    });
-  }
-}
-
-async function pdf(){
-  const { jsPDF } = window.jspdf;
-  const pdf = new jsPDF();
-
-  const t=document.querySelectorAll(".ticket");
-
-  for(let i=0;i<t.length;i++){
-    const canvas=await html2canvas(t[i]);
-    const img=canvas.toDataURL("image/png");
-
-    if(i>0) pdf.addPage();
-    pdf.addImage(img,"PNG",0,0);
-  }
-
-  pdf.save("tickets.pdf");
-}
-
-async function zip(){
-  const zip=new JSZip();
-  const t=document.querySelectorAll(".ticket");
-
-  for(let i=0;i<t.length;i++){
-    const canvas=await html2canvas(t[i]);
-    const img=canvas.toDataURL("image/png").split(",")[1];
-
-    zip.file(codigos[i]+".png",img,{base64:true});
-  }
-
-  const blob=await zip.generateAsync({type:"blob"});
-  const a=document.createElement("a");
-  a.href=URL.createObjectURL(blob);
-  a.download="tickets.zip";
-  a.click();
+   new QRCode(document.getElementById("qr-"+i),{
+     text:"ENT-"+n,
+     width:120,
+     height:120
+   });
+ }
 }
 </script>
 
